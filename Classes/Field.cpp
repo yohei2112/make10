@@ -7,7 +7,7 @@ USING_NS_CC;
 
 void Field::initField()
 {
-
+    isExistDeletePanel = false;
     for (int x = 0; x < FIELD_WIDTH; x++)
     {
         for (int y = 0; y < FIELD_HEIGHT * 2; y++)
@@ -108,12 +108,14 @@ void Field::checkAdjoinSameNum(int posX, int posY)
 
 void Field::createDeleteField()
 {
+    isExistDeletePanel = false;
     for (int y = 0; y < FIELD_HEIGHT; y++)
     {
         for (int x = 0; x < FIELD_WIDTH; x++)
         {
             if (field[x][y] == adjoinSameNumField[x][y])
             {
+                isExistDeletePanel = true;
                 deleteField[x][y] = 1;
             } else {
                 deleteField[x][y] = 0;
@@ -135,6 +137,7 @@ void Field::deleteMainField()
             }
         }
     }
+    isExistDeletePanel = false;
 }
 
 void Field::createDropField()
@@ -159,14 +162,8 @@ void Field::dropMainField()
             {
                 field[x][y - dropField[x][y]] = field[x][y];
                 CCLog ("debug:drop field [%d][%d] => [%d][%d] %d", x,y,x,y - dropField[x][y],field[x][y]);
+                field[x][y] = (arc4random() % 5) + 1;
             }
-        }
-    }
-    for (int y = FIELD_HEIGHT; y < FIELD_HEIGHT * 2; y++)
-    {
-        for (int x = 0; x < FIELD_WIDTH; x++)
-        {
-            field[x][y] = (arc4random() % 5) + 1;;
         }
     }
 }

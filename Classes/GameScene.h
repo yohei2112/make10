@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Field.h"
+#include "Action.h"
 #include "Config.h"
 
 USING_NS_CC;
@@ -13,6 +14,7 @@ class GameScene : public cocos2d::CCLayer
 
 protected:
     Field* field;
+    Action* action;
 
     enum kTag
     {
@@ -46,10 +48,6 @@ protected:
     CCSprite* panelSpriteArray[FIELD_WIDTH][FIELD_HEIGHT * 2];
     CCSprite* holdingPanel;
 
-    CCSize winSize;
-    CCSize panelSize;
-    CCPoint centerPoint;
-    CCPoint location;
 
     bool isGame;
     bool isTouch;
@@ -57,12 +55,16 @@ protected:
     bool isHoldPanel;
     bool isDrop;
 
+    int gameStatus;
     int tapCount;
     int holdPanelX;
     int holdPanelY;
     int dropPanelCount;
     int dropEndCount;
 
+    CCSize panelSize;
+    CCPoint location;
+
     virtual void onEnter();
     virtual bool ccTouchBegan(CCTouch* pTouch, CCEvent* pEvent);
     virtual void ccTouchMoved(CCTouch* pTouch, CCEvent* pEvent);
@@ -86,12 +88,15 @@ public:
     void resetPanelTexture();
     void hoge();
     void deleteField();
+    void deletePanel();
     void dropField();
     void dropPanel();
     void startHoldPanel();
     void moveHoldingPanel();
     void getPanelCoordinateByLocation(int posX, int posY, int &x, int &y);
     void endDrop();
+
+
 
     // implement the "static node()" method manually
     CREATE_FUNC(GameScene);

@@ -213,3 +213,12 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+proj.android/res/values/keys.xml
+proj.blackberry/
+proj.linux/
+proj.mac/
+proj.marmalade/
+proj.tizen/
+proj.winrt/
+proj.wp8/
+proj.win32/
