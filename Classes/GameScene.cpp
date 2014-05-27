@@ -107,11 +107,11 @@ void GameScene::update(float dt)
             break;
         case STATUS_DELETE_PANEL:
             gameStatus = STATUS_WAIT_PROCESS;
+            deletePanelCount = 0;
             field->deleteMainField();
-            resetPanelTexture();
-            gameStatus = STATUS_DROP_PANEL;
+            deletePanel();
             break;
-        case STATUS_DROP_PANEL:
+        case STATUS_END_DELETE_PANEL:
             gameStatus = STATUS_WAIT_PROCESS;
             field->createDropField();
             field->dropMainField();
@@ -191,17 +191,33 @@ void GameScene::initPanel()
 
 void GameScene::deletePanel()
 {
-
+    deletePanelCount = 0;
+    
     for (int x = 0; x < FIELD_WIDTH; x++)
     {
         for (int y = 0; y < FIELD_HEIGHT; y++)
         {
             if (field->getFieldValue(x,y) == 0)
             {
+                deletePanelCount++;
+                CCCallFuncN* callEndDelete = CCCallFuncN::create(this, callfuncN_selector(GameScene::endDelete));
+
+                panelSpriteArray[x][y]->runAction(CCSequence::create(action->getDeletePanelAction(), callEndDelete, NULL));
+
             }
         }
     }
 
+}
+
+void GameScene::endDelete()
+{
+    deleteEndCount++;
+    if (deletePanelCount == deleteEndCount)
+    {
+        deleteEndCount = 0;
+        gameStatus = STATUS_END_DELETE_PANEL;
+    }
 }
 
 void GameScene::dropPanel()
@@ -240,6 +256,11 @@ void GameScene::endDrop()
     }
 }
 
+void GameScene::setStatus(int status)
+{
+    gameStatus = status;
+}
+
 void GameScene::resetPanelTexture()
 {
     CCLog ("debug:resetPanelTexture");
@@ -262,14 +283,7 @@ void GameScene::resetPanelTexture()
             CCSpriteBatchNode* panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex(field->getFieldValue(x,y));
             panelSpriteArray[x][y]->setPosition(ccp(PANEL_CENTER_POINT.x + (x - 2) * panelSize.width, PANEL_CENTER_POINT.y + (y - 2) * panelSize.height));
             panelSpriteArray[x][y]->setTexture(panelNode->getTexture());
-            if (field->getFieldValue(x,y) == 0)
-            {
-                panelSpriteArray[x][y]->setVisible(false);
-            }
-            else
-            {
-                panelSpriteArray[x][y]->setVisible(true);
-            }
+            panelSpriteArray[x][y]->setOpacity(255);
         }
     }
         holdingPanel->setScaleX(1);

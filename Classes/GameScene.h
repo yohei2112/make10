@@ -59,6 +59,8 @@ protected:
     int tapCount;
     int holdPanelX;
     int holdPanelY;
+    int deletePanelCount;
+    int deleteEndCount;
     int dropPanelCount;
     int dropEndCount;
 
@@ -89,12 +91,14 @@ public:
     void hoge();
     void deleteField();
     void deletePanel();
+    void endDelete();
     void dropField();
     void dropPanel();
+    void endDrop();
     void startHoldPanel();
     void moveHoldingPanel();
     void getPanelCoordinateByLocation(int posX, int posY, int &x, int &y);
-    void endDrop();
+    void setStatus(int status);
 
 
 
