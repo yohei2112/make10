@@ -40,6 +40,7 @@ protected:
     };
 
     CCLabelTTF* versionLabel;
+    CCLabelTTF* statusLabel;
     CCSprite* background;
     CCSprite* mask;
     CCSprite* title;
@@ -63,10 +64,11 @@ protected:
     int deleteEndCount;
     int dropPanelCount;
     int dropEndCount;
+    int holdEndCount;
 
     CCSize panelSize;
     CCPoint location;
-
+
     virtual void onEnter();
     virtual bool ccTouchBegan(CCTouch* pTouch, CCEvent* pEvent);
     virtual void ccTouchMoved(CCTouch* pTouch, CCEvent* pEvent);

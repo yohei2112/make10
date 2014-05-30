@@ -15,6 +15,18 @@ void Field::initField()
             field[x][y] = (arc4random() % 5) + 1;
         }
     }
+
+    checkAdjoinSameNumField();
+    createDeleteField();
+
+    while(isExistDeletePanel)
+    {
+        deleteMainField();
+        createDropField();
+        dropMainField();
+        checkAdjoinSameNumField();
+        createDeleteField();
+    }
 /*
 field[0][0] = 1;
 field[1][0] = 3;

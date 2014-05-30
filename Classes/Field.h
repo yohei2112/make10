@@ -20,10 +20,10 @@ public:
     int getDropCount(int x, int y);
     void swapFieldValue(int x1, int y1, int x2, int y2);
 
-    int checkedAdjoinSameNumField[FIELD_WIDTH][FIELD_HEIGHT]; //“¯‚¶”Žš‚ª—×‚è‡‚Á‚½ƒ}ƒX‚Ìƒ`ƒFƒbƒN‚ªI‚í‚Á‚½À•W‚ðŠÇ—‚·‚éƒtƒB[ƒ‹ƒh
-    int adjoinSameNumField[FIELD_WIDTH][FIELD_HEIGHT]; //“¯‚¶”Žš‚Æ—×‚è‡‚Á‚Ä‚¢‚é”‚ª“ü‚éƒtƒB[ƒ‹ƒh
-    int deleteField[FIELD_WIDTH][FIELD_HEIGHT]; //íœ‚·‚éÀ•W‚ª“ü‚éƒtƒB[ƒ‹ƒh
-    int dropField[FIELD_WIDTH][FIELD_HEIGHT * 2]; //‚»‚ÌƒuƒƒbƒN‚Ì‰º‚É‚ ‚éÁ‚¦‚½ƒuƒƒbƒN‚Ì”‚ª“ü‚éƒtƒB[ƒ‹ƒh
+    int checkedAdjoinSameNumField[FIELD_WIDTH][FIELD_HEIGHT]; //åŒã˜æ•°å­—ãŒéš£ã‚Šåˆã£ãŸãƒžã‚¹ã®ãƒã‚§ãƒƒã‚¯ãŒçµ‚ã‚ã£ãŸåº§æ¨™ã‚’ç®¡ç†ã™ã‚‹ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰
+    int adjoinSameNumField[FIELD_WIDTH][FIELD_HEIGHT]; //åŒã˜æ•°å­—ã¨éš£ã‚Šåˆã£ã¦ã„ã‚‹æ•°ãŒå…¥ã‚‹ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰
+    int deleteField[FIELD_WIDTH][FIELD_HEIGHT]; //å‰Šé™¤ã™ã‚‹åº§æ¨™ãŒå…¥ã‚‹ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰
+    int dropField[FIELD_WIDTH][FIELD_HEIGHT * 2]; //ãã®ãƒ–ãƒ­ãƒƒã‚¯ã®ä¸‹ã«ã‚ã‚‹æ¶ˆãˆãŸãƒ–ãƒ­ãƒƒã‚¯ã®æ•°ãŒå…¥ã‚‹ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰
     int adjoinSameNumCount;
     int field[FIELD_WIDTH][FIELD_HEIGHT * 2];
 

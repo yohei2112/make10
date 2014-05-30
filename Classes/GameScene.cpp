@@ -34,7 +34,7 @@ bool GameScene::init()
     {
         return false;
     }
-
+
     gameStatus = STATUS_INIT_GAME;
 
     panelNodeArray = CCArray::create();
@@ -49,6 +49,12 @@ bool GameScene::init()
     panelSize = holdingPanel->getContentSize();
     holdingPanel->setVisible(false);
     this->addChild(holdingPanel, kZOrder_HoldPanel);
+
+    CCString* statusString = CCString::createWithFormat("status:%02d", gameStatus);
+    statusLabel = CCLabelTTF::create(statusString->getCString(), "", NUMBER_FONT_SIZE);
+    statusLabel->setPosition(ccp(WIN_SIZE.width - statusLabel->getContentSize().width * 0.5, WIN_SIZE.height - statusLabel->getContentSize().height * 0.5));
+    this->addChild(statusLabel, kZOrder_Score);
+
 
 tapCount = 0;
 dropEndCount = 0;
@@ -84,12 +90,27 @@ void GameScene::onEnter()
 
 void GameScene::update(float dt)
 {
+    CCString* statusString = CCString::createWithFormat("status:%02d", gameStatus);
+    statusLabel->setString(statusString->getCString());
     switch( gameStatus ){
         case STATUS_TAP_START:
-            startHoldPanel();
+            if(location.x >= PANEL_CENTER_POINT.x - ((floor(FIELD_WIDTH / 2) + 0.5) * panelSize.width) &&
+               location.x < PANEL_CENTER_POINT.x + ((floor(FIELD_WIDTH / 2) + 0.5) * panelSize.width) &&
+               location.y >= PANEL_CENTER_POINT.y - ((floor(FIELD_HEIGHT / 2) + 0.5) * panelSize.height) &&
+               location.y < PANEL_CENTER_POINT.y + ((floor(FIELD_HEIGHT / 2) + 0.5) * panelSize.height))
+            {
+                startHoldPanel();
+            }
             break;
         case STATUS_HOLD_PANEL:
             moveHoldingPanel();
+            break;
+        case STATUS_HOLD_END:
+            holdEndCount++;
+            if (holdEndCount > HOLD_END_MARGIN)
+            {
+                gameStatus = STATUS_CHECK_DELETE;
+            }
             break;
         case STATUS_CHECK_DELETE:
             gameStatus = STATUS_WAIT_PROCESS;
@@ -123,10 +144,16 @@ void GameScene::update(float dt)
 
 bool GameScene::ccTouchBegan(CCTouch* pTouch, CCEvent* pEvent)
 {
-    if (gameStatus != STATUS_TAP_READY)
+    if (gameStatus == STATUS_HOLD_END)
+    {
+        gameStatus = STATUS_HOLD_PANEL;
+        return true;
+    }
+    else if (gameStatus != STATUS_TAP_READY)
     {
         return true;
     }
+
     gameStatus = STATUS_TAP_START;
     isTouch = true;
 
@@ -149,11 +176,17 @@ void GameScene::ccTouchMoved(CCTouch* pTouch, CCEvent* pEvent)
 
 void GameScene::ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent)
 {
-    if(gameStatus != STATUS_HOLD_PANEL)
+    if(gameStatus < STATUS_HOLD_PANEL)
     {
-        return;
+        gameStatus = STATUS_TAP_READY;
     }
-    gameStatus = STATUS_CHECK_DELETE;
+    else if(gameStatus == STATUS_HOLD_PANEL)
+    {
+        holdEndCount = 0;
+        gameStatus = STATUS_HOLD_END;
+    }
+
+    return;
 
     isTouch = false;
     isHoldPanel = false;
@@ -170,7 +203,7 @@ void GameScene::makeBackground()
     mask->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
     this->addChild(mask, kZOrder_PanelMask);
 }
-
+
 
 void GameScene::initPanel()
 {
@@ -294,17 +327,15 @@ void GameScene::resetPanelTexture()
 void GameScene::startHoldPanel()
 {
     getPanelCoordinateByLocation(location.x, location.y, holdPanelX, holdPanelY);
-    if(holdPanelX >= 0 && holdPanelX < FIELD_WIDTH && holdPanelY >= 0 && holdPanelY < FIELD_HEIGHT)
-    {
-        gameStatus = STATUS_HOLD_PANEL;
-        isHoldPanel = true;
-        holdingPanel = panelSpriteArray[holdPanelX][holdPanelY];
-        holdingPanel->setScaleX(1.1);
-        holdingPanel->setScaleY(1.1);
-        holdingPanel->setPosition(ccp(location.x,location.y + panelSize.height * 0.5));
-        holdingPanel->setVisible(true);
-        this->reorderChild(holdingPanel, kZOrder_HoldPanel);
-    }
+    gameStatus = STATUS_HOLD_PANEL;
+    isHoldPanel = true;
+    holdingPanel = panelSpriteArray[holdPanelX][holdPanelY];
+    holdingPanel->setScaleX(1.1);
+    holdingPanel->setScaleY(1.1);
+    holdingPanel->setOpacity(192);
+    holdingPanel->setPosition(ccp(location.x,location.y + panelSize.height * 0.5));
+    holdingPanel->setVisible(true);
+    this->reorderChild(holdingPanel, kZOrder_HoldPanel);
 }
 
 void GameScene::moveHoldingPanel()
