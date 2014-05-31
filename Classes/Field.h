@@ -26,6 +26,9 @@ public:
     int dropField[FIELD_WIDTH][FIELD_HEIGHT * 2]; //そのブロックの下にある消えたブロックの数が入るフィールド
     int adjoinSameNumCount;
     int field[FIELD_WIDTH][FIELD_HEIGHT * 2];
+    int deletePanelCount;
+    int deletePanelCounter[6];
+    int comboCount;
 
     bool isExistDeletePanel;
 

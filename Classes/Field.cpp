@@ -121,6 +121,9 @@ void Field::checkAdjoinSameNum(int posX, int posY)
 void Field::createDeleteField()
 {
     isExistDeletePanel = false;
+    deletePanelCount = 0;
+    comboCount = 0;
+    int deletePanelCounter[6] = {};
     for (int y = 0; y < FIELD_HEIGHT; y++)
     {
         for (int x = 0; x < FIELD_WIDTH; x++)
@@ -129,12 +132,24 @@ void Field::createDeleteField()
             {
                 isExistDeletePanel = true;
                 deleteField[x][y] = 1;
+                deletePanelCount++;
+                deletePanelCounter[field[x][y]]++;
             } else {
                 deleteField[x][y] = 0;
             }
             CCLog ("debug:deleteField[%d][%d] = %d", x,y,deleteField[x][y]);
         }
     }
+
+    for (int i = 1; i <= 5; i++)
+    {
+        if(deletePanelCounter[i] > 0)
+        {
+            comboCount += (int)floor(deletePanelCounter[i]/i);
+        }
+        deletePanelCounter[i] = 0;
+    }
+
 }
 
 void Field::deleteMainField()
@@ -211,3 +226,4 @@ void Field::swapFieldValue(int x1, int y1, int x2, int y2)
     field[x2][y2] = tmp;
 
 }
+

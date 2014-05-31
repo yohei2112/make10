@@ -35,6 +35,11 @@ bool GameScene::init()
         return false;
     }
 
+    totalScore = 0;
+    tmpScore = 0;
+    comboCounter = 0;
+
+
     gameStatus = STATUS_INIT_GAME;
 
     panelNodeArray = CCArray::create();
@@ -50,14 +55,12 @@ bool GameScene::init()
     holdingPanel->setVisible(false);
     this->addChild(holdingPanel, kZOrder_HoldPanel);
 
-    CCString* statusString = CCString::createWithFormat("status:%02d", gameStatus);
+    CCString* statusString = CCString::createWithFormat("score:%d\ncombo:%d\ntmpScore:%d\nstatus:%02d", totalScore, comboCounter,tmpScore, gameStatus);
     statusLabel = CCLabelTTF::create(statusString->getCString(), "", NUMBER_FONT_SIZE);
-    statusLabel->setPosition(ccp(WIN_SIZE.width - statusLabel->getContentSize().width * 0.5, WIN_SIZE.height - statusLabel->getContentSize().height * 0.5));
+    statusLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height - statusLabel->getContentSize().height * 0.5));
     this->addChild(statusLabel, kZOrder_Score);
 
 
-tapCount = 0;
-dropEndCount = 0;
     field = new Field();
     action = new Action();
 
@@ -90,7 +93,7 @@ void GameScene::onEnter()
 
 void GameScene::update(float dt)
 {
-    CCString* statusString = CCString::createWithFormat("status:%02d", gameStatus);
+    CCString* statusString = CCString::createWithFormat("score:%d\ncombo:%d\ntmpScore:%d\nstatus:%02d", totalScore, comboCounter,tmpScore, gameStatus);
     statusLabel->setString(statusString->getCString());
     switch( gameStatus ){
         case STATUS_TAP_START:
@@ -123,12 +126,16 @@ void GameScene::update(float dt)
             }
             else
             {
+                totalScore += tmpScore;
+                tmpScore = 0;
+                comboCounter = 0;
                 gameStatus = STATUS_TAP_READY;
             }
             break;
         case STATUS_DELETE_PANEL:
             gameStatus = STATUS_WAIT_PROCESS;
-            deletePanelCount = 0;
+            comboCounter += field->comboCount;
+            tmpScore += field->deletePanelCount * comboCounter;
             field->deleteMainField();
             deletePanel();
             break;
@@ -224,15 +231,12 @@ void GameScene::initPanel()
 
 void GameScene::deletePanel()
 {
-    deletePanelCount = 0;
-    
     for (int x = 0; x < FIELD_WIDTH; x++)
     {
         for (int y = 0; y < FIELD_HEIGHT; y++)
         {
             if (field->getFieldValue(x,y) == 0)
             {
-                deletePanelCount++;
                 CCCallFuncN* callEndDelete = CCCallFuncN::create(this, callfuncN_selector(GameScene::endDelete));
 
                 panelSpriteArray[x][y]->runAction(CCSequence::create(action->getDeletePanelAction(), callEndDelete, NULL));
@@ -246,7 +250,7 @@ void GameScene::deletePanel()
 void GameScene::endDelete()
 {
     deleteEndCount++;
-    if (deletePanelCount == deleteEndCount)
+    if (field->deletePanelCount == deleteEndCount)
     {
         deleteEndCount = 0;
         gameStatus = STATUS_END_DELETE_PANEL;
@@ -258,6 +262,7 @@ void GameScene::dropPanel()
     isDrop = true;
     int dropCount;
     dropPanelCount = 0;
+    dropEndCount = 0;
     for (int x = 0; x < FIELD_WIDTH; x++)
     {
         for (int y = 0; y < FIELD_HEIGHT * 2; y++)

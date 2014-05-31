@@ -60,11 +60,13 @@ protected:
     int tapCount;
     int holdPanelX;
     int holdPanelY;
-    int deletePanelCount;
     int deleteEndCount;
     int dropPanelCount;
     int dropEndCount;
     int holdEndCount;
+    int totalScore;
+    int tmpScore;
+    int comboCounter;
 
     CCSize panelSize;
     CCPoint location;
