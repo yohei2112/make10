@@ -42,9 +42,14 @@ bool GameScene::init()
 
     gameStatus = STATUS_INIT_GAME;
 
+    SimpleAudioEngine::sharedEngine()->setEffectsVolume(0.5);
+    SimpleAudioEngine::sharedEngine()->preloadEffect("move_panel.wav");
+    SimpleAudioEngine::sharedEngine()->preloadEffect("drop_panel.wav");
+    SimpleAudioEngine::sharedEngine()->preloadEffect("delete_panel.wav");
+
     panelNodeArray = CCArray::create();
     CCString* panelNodeString;
-    for (int i = 0; i <= 5; i++)
+    for (int i = 0; i <= PANEL_TYPE_NUM; i++)
     {
         panelNodeString = CCString::createWithFormat("panel_%d.png", i);
         panelNodeArray->addObject(CCSpriteBatchNode::create(panelNodeString->getCString()));
@@ -221,7 +226,7 @@ void GameScene::initPanel()
         {
             CCSpriteBatchNode* panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex(field->getFieldValue(x,y));
             CCSprite* panelSprite = CCSprite::createWithTexture(panelNode->getTexture());
-            panelSprite->setPosition(ccp(PANEL_CENTER_POINT.x + (x - 2) * panelSize.width, PANEL_CENTER_POINT.y + (y - 2) * panelSize.height));
+            panelSprite->setPosition(getPanelPosition(x,y));
             panelSprite->setTag(x * 10 + y);
             panelSpriteArray[x][y] = panelSprite;
             this->addChild(panelSpriteArray[x][y]);
@@ -231,6 +236,7 @@ void GameScene::initPanel()
 
 void GameScene::deletePanel()
 {
+    SimpleAudioEngine::sharedEngine()->playEffect("delete_panel.wav");
     for (int x = 0; x < FIELD_WIDTH; x++)
     {
         for (int y = 0; y < FIELD_HEIGHT; y++)
@@ -259,6 +265,7 @@ void GameScene::endDelete()
 
 void GameScene::dropPanel()
 {
+    SimpleAudioEngine::sharedEngine()->playEffect("drop_panel.wav");
     isDrop = true;
     int dropCount;
     dropPanelCount = 0;
@@ -306,12 +313,12 @@ void GameScene::resetPanelTexture()
 
     panelNodeArray = CCArray::create();
     CCString* panelNodeString;
-    for (int i = 0; i <= 5; i++)
+    for (int i = 0; i <= PANEL_TYPE_NUM; i++)
     {
         panelNodeString = CCString::createWithFormat("panel_%d.png", i);
         panelNodeArray->addObject(CCSpriteBatchNode::create(panelNodeString->getCString()));
-        this->addChild((CCSpriteBatchNode*)panelNodeArray->objectAtIndex(i), kZOrder_Panel);
     }
+
 
     for (int x = 0; x < FIELD_WIDTH; x++)
     {
@@ -319,13 +326,14 @@ void GameScene::resetPanelTexture()
         {
             CCLog ("debug:resetPanelTexture x = %d y = %d fieldValue = %d", x,y,field->getFieldValue(x,y));
             CCSpriteBatchNode* panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex(field->getFieldValue(x,y));
-            panelSpriteArray[x][y]->setPosition(ccp(PANEL_CENTER_POINT.x + (x - 2) * panelSize.width, PANEL_CENTER_POINT.y + (y - 2) * panelSize.height));
+            panelSpriteArray[x][y]->stopAllActions();
+            panelSpriteArray[x][y]->setPosition(getPanelPosition(x,y));
             panelSpriteArray[x][y]->setTexture(panelNode->getTexture());
             panelSpriteArray[x][y]->setOpacity(255);
         }
-    }
-        holdingPanel->setScaleX(1);
-        holdingPanel->setScaleY(1);
+}
+    holdingPanel->setScaleX(1);
+    holdingPanel->setScaleY(1);
 }
 
 
@@ -350,22 +358,22 @@ void GameScene::moveHoldingPanel()
     getPanelCoordinateByLocation(location.x, location.y, posX, posY);
     int x = location.x;
     int y = location.y + panelSize.height * 0.5;
-    if (x < PANEL_CENTER_POINT.x - panelSize.width * 2)
+    if (x < getPanelPosition(0, 0).x)
     {
-        x = PANEL_CENTER_POINT.x - panelSize.width * 2;
+        x = getPanelPosition(0, 0).x;
     }
-    else if(x > PANEL_CENTER_POINT.x + panelSize.width * 2)
+    else if(x > getPanelPosition(FIELD_WIDTH - 1, 0).x)
     {
-        x = PANEL_CENTER_POINT.x + panelSize.width * 2;
+        x = getPanelPosition(FIELD_WIDTH - 1, 0).x;
     }
 
-    if (y < PANEL_CENTER_POINT.y - panelSize.height * 2)
+    if (y < getPanelPosition(0, 0).y)
     {
-        y = PANEL_CENTER_POINT.y - panelSize.width * 2;
+        y = getPanelPosition(0, 0).y;
     }
-    else if(y > PANEL_CENTER_POINT.y + panelSize.height * 2)
+    else if(y > getPanelPosition(0, FIELD_HEIGHT - 1).y)
     {
-        y = PANEL_CENTER_POINT.y + panelSize.width * 2;
+        y = getPanelPosition(0, FIELD_HEIGHT - 1).y;
     }
 
     holdingPanel->setPosition(ccp(x, y));
@@ -374,28 +382,42 @@ void GameScene::moveHoldingPanel()
     {
         field->swapFieldValue(holdPanelX,holdPanelY,posX,posY);
         CCMoveTo* movePanel = action->getMovePanelAction(holdPanelX, holdPanelY, panelSize);
+        panelSpriteArray[posX][posY]->stopAllActions();
         panelSpriteArray[posX][posY]->runAction(movePanel);
         CCSprite* tmpSprite = panelSpriteArray[posX][posY];
         panelSpriteArray[posX][posY] = panelSpriteArray[holdPanelX][holdPanelY];
         panelSpriteArray[holdPanelX][holdPanelY] = tmpSprite;
         holdPanelX = posX;
         holdPanelY = posY;
+        SimpleAudioEngine::sharedEngine()->playEffect("move_panel.wav");
     }
 
 }
 
 void GameScene::getPanelCoordinateByLocation(int posX, int posY, int &x, int &y)
 {
-    int diffX;
-    int diffY;
-    diffX = int(round((posX - PANEL_CENTER_POINT.x) / panelSize.width));
-    diffY = int(round((posY - PANEL_CENTER_POINT.y) / panelSize.height));
-    x = std::min(FIELD_WIDTH -1 ,std::max(0,diffX + 2));
-    y = std::min(FIELD_HEIGHT -1, std::max(0,diffY + 2));
-    
+    float diffX;
+    float diffY;
+    diffX = (posX - PANEL_CENTER_POINT.x) / panelSize.width;
+    diffY = (posY - PANEL_CENTER_POINT.y) / panelSize.height;
+    if (FIELD_WIDTH % 2 == 1)
+    {
+        x = std::min(FIELD_WIDTH -1 ,std::max(0,int(round(diffX)) + int(floor(FIELD_WIDTH / 2.0))));
+    } else {
+        //TODO 偶数の時の計算
+    }
+    if (FIELD_HEIGHT % 2 == 1)
+    {
+        y = std::min(FIELD_HEIGHT -1, std::max(0,int(round(diffY)) + int(floor(FIELD_HEIGHT / 2.0))));
+    } else {
+        //TODO 偶数の時の計算
+    }
 }
 
-
+CCPoint GameScene::getPanelPosition(int x, int y)
+{
+    return ccp(PANEL_CENTER_POINT.x + (x + 0.5 - (FIELD_WIDTH / 2.0)) * panelSize.width, PANEL_CENTER_POINT.y + (y + 0.5 - (FIELD_HEIGHT / 2.0)) * panelSize.height);
+}
 
 void GameScene::menuCloseCallback(CCObject* pSender)
 {

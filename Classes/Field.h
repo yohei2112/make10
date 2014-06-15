@@ -27,7 +27,7 @@ public:
     int adjoinSameNumCount;
     int field[FIELD_WIDTH][FIELD_HEIGHT * 2];
     int deletePanelCount;
-    int deletePanelCounter[6];
+    int deletePanelCounter[PANEL_TYPE_NUM + 1];
     int comboCount;
 
     bool isExistDeletePanel;

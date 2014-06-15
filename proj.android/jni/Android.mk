@@ -9,6 +9,7 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../Classes/GameScene.cpp \
+                   ../../Classes/TitleScene.cpp \
                    ../../Classes/Field.cpp \
                    ../../Classes/Action.cpp \
                    ../../Classes/AdMobUtil.cpp

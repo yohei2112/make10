@@ -10,6 +10,8 @@
 
 #define HOLD_END_MARGIN 3
 
+#define PANEL_TYPE_NUM 6
+
 
 //TODO ステータスの名前見直し、次の処理を知らなくてもいい名前に。STATUS_CHECK_DELETE → STATUS_END_HOLD
 enum status

@@ -12,7 +12,7 @@ void Field::initField()
     {
         for (int y = 0; y < FIELD_HEIGHT * 2; y++)
         {
-            field[x][y] = (arc4random() % 5) + 1;
+            field[x][y] = (arc4random() % PANEL_TYPE_NUM) + 1;
         }
     }
 
@@ -96,12 +96,12 @@ void Field::checkAdjoinSameNum(int posX, int posY)
     checkedAdjoinSameNumField[posX][posY] = 1;
     adjoinSameNumCount++;
 
-    if ( posX < 4 && field[posX + 1][posY] == field[posX][posY])
+    if ( posX < FIELD_WIDTH - 1 && field[posX + 1][posY] == field[posX][posY])
     {
         Field::checkAdjoinSameNum(posX + 1, posY);
     }
 
-    if (posY < 4 && field[posX][posY + 1] == field[posX][posY])
+    if (posY < FIELD_HEIGHT - 1 && field[posX][posY + 1] == field[posX][posY])
     {
         Field::checkAdjoinSameNum(posX, posY + 1);
     }
@@ -123,12 +123,12 @@ void Field::createDeleteField()
     isExistDeletePanel = false;
     deletePanelCount = 0;
     comboCount = 0;
-    int deletePanelCounter[6] = {};
+    int deletePanelCounter[PANEL_TYPE_NUM + 1] = {};
     for (int y = 0; y < FIELD_HEIGHT; y++)
     {
         for (int x = 0; x < FIELD_WIDTH; x++)
         {
-            if (field[x][y] == adjoinSameNumField[x][y])
+            if (field[x][y] <= adjoinSameNumField[x][y])
             {
                 isExistDeletePanel = true;
                 deleteField[x][y] = 1;
@@ -141,7 +141,7 @@ void Field::createDeleteField()
         }
     }
 
-    for (int i = 1; i <= 5; i++)
+    for (int i = 1; i <= PANEL_TYPE_NUM; i++)
     {
         if(deletePanelCounter[i] > 0)
         {
@@ -189,7 +189,7 @@ void Field::dropMainField()
             {
                 field[x][y - dropField[x][y]] = field[x][y];
                 CCLog ("debug:drop field [%d][%d] => [%d][%d] %d", x,y,x,y - dropField[x][y],field[x][y]);
-                field[x][y] = (arc4random() % 5) + 1;
+                field[x][y] = (arc4random() % PANEL_TYPE_NUM) + 1;
             }
         }
     }

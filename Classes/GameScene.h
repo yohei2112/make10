@@ -5,9 +5,10 @@
 #include "Field.h"
 #include "Action.h"
 #include "Config.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
-
+using namespace CocosDenshion;
 
 class GameScene : public cocos2d::CCLayer
 {
@@ -103,7 +104,7 @@ public:
     void moveHoldingPanel();
     void getPanelCoordinateByLocation(int posX, int posY, int &x, int &y);
     void setStatus(int status);
-
+    CCPoint getPanelPosition(int x, int y);
 
 
     // implement the "static node()" method manually
