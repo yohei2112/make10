@@ -4,8 +4,10 @@
 #include "cocos2d.h"
 #include "Field.h"
 #include "Action.h"
+#include "Sound.h"
 #include "Config.h"
 #include "SimpleAudioEngine.h"
+#include "ResultLayer.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -16,6 +18,7 @@ class GameScene : public cocos2d::CCLayer
 protected:
     Field* field;
     Action* action;
+    Sound* sound;
 
     enum kTag
     {
@@ -38,13 +41,16 @@ protected:
         kZOrder_PlayButton,
         kZOrder_GameOver,
         kZOrder_Title,
+        kZOrder_Result,
     };
 
     CCLabelTTF* versionLabel;
     CCLabelTTF* statusLabel;
+    CCLabelTTF* resultLabel;
     CCSprite* background;
     CCSprite* mask;
     CCSprite* title;
+    CCSprite* resultBack;
     CCSpriteBatchNode* panelNode;
     CCArray* panelNodeArray;
     CCSprite* panelSpriteArray[FIELD_WIDTH][FIELD_HEIGHT * 2];
@@ -68,6 +74,10 @@ protected:
     int totalScore;
     int tmpScore;
     int comboCounter;
+    int maxCombo;
+    float gameTimerCount;
+    float holdPanelTimerCount;
+    float gameStartCount;
 
     CCSize panelSize;
     CCPoint location;
@@ -78,6 +88,7 @@ protected:
     virtual void ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent);
 
     void update(float dt);
+    void updateGameTimer(float dt);
 
 public:
 
@@ -104,6 +115,7 @@ public:
     void moveHoldingPanel();
     void getPanelCoordinateByLocation(int posX, int posY, int &x, int &y);
     void setStatus(int status);
+    void makeResult();
     CCPoint getPanelPosition(int x, int y);
 
 

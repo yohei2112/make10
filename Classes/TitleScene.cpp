@@ -80,4 +80,7 @@ void TitleScene::makeBackground()
     background = CCSprite::create("background.png");
     background->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
     this->addChild(background);
+    CCSprite* titleSprite = CCSprite::create("title.png");
+    titleSprite->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
+    this->addChild(titleSprite);
 }

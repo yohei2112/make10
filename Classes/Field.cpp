@@ -128,7 +128,7 @@ void Field::createDeleteField()
     {
         for (int x = 0; x < FIELD_WIDTH; x++)
         {
-            if (field[x][y] <= adjoinSameNumField[x][y])
+            if (field[x][y] == adjoinSameNumField[x][y])
             {
                 isExistDeletePanel = true;
                 deleteField[x][y] = 1;

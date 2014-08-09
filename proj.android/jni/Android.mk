@@ -10,8 +10,10 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../Classes/GameScene.cpp \
                    ../../Classes/TitleScene.cpp \
+                   ../../Classes/ResultLayer.cpp \
                    ../../Classes/Field.cpp \
                    ../../Classes/Action.cpp \
+                   ../../Classes/Sound.cpp \
                    ../../Classes/AdMobUtil.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

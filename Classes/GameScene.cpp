@@ -38,14 +38,11 @@ bool GameScene::init()
     totalScore = 0;
     tmpScore = 0;
     comboCounter = 0;
-
+    maxCombo = 0;
+    gameTimerCount = GAME_TIME_LIMIT;
 
     gameStatus = STATUS_INIT_GAME;
 
-    SimpleAudioEngine::sharedEngine()->setEffectsVolume(0.5);
-    SimpleAudioEngine::sharedEngine()->preloadEffect("move_panel.wav");
-    SimpleAudioEngine::sharedEngine()->preloadEffect("drop_panel.wav");
-    SimpleAudioEngine::sharedEngine()->preloadEffect("delete_panel.wav");
 
     panelNodeArray = CCArray::create();
     CCString* panelNodeString;
@@ -68,6 +65,7 @@ bool GameScene::init()
 
     field = new Field();
     action = new Action();
+    sound = new Sound();
 
     makeBackground();
 
@@ -78,7 +76,7 @@ bool GameScene::init()
     field->initField();
     initPanel();
 
-    gameStatus = STATUS_TAP_READY;
+    gameStatus = STATUS_END_INIT_SCENE;
 
     return true;
 }
@@ -93,14 +91,59 @@ void GameScene::onEnter()
     this->setTouchMode(kCCTouchesOneByOne);
 
     scheduleUpdate();
+    this->schedule(schedule_selector(GameScene::updateGameTimer), 0.1);
+
+}
+
+
+void GameScene::updateGameTimer(float dt)
+{
+    if (gameStatus <= STATUS_GAME_START_COUNT_DOWN_END)
+    {
+        return;
+    }
+    if (gameStatus < STATUS_GAME_TIME_LIMIT)
+    {
+        gameTimerCount -= dt;
+    }
+    if (gameTimerCount < 0 && gameStatus == STATUS_TAP_READY)
+    {
+        gameStatus = STATUS_GAME_TIME_LIMIT;
+    }
+
+//    CCString* statusString = CCString::createWithFormat("score:%d\ncombo:%d tmpScore:%d\nstatus:%02d\ntimer:%2.2f", totalScore, comboCounter,tmpScore, gameStatus, gameTimerCount);
+    CCString* statusString = CCString::createWithFormat("status:%02d\ntimer:%2.2f", gameStatus,gameTimerCount);
+    statusLabel->setString(statusString->getCString());
+
 }
 
 
 void GameScene::update(float dt)
 {
-    CCString* statusString = CCString::createWithFormat("score:%d\ncombo:%d\ntmpScore:%d\nstatus:%02d", totalScore, comboCounter,tmpScore, gameStatus);
-    statusLabel->setString(statusString->getCString());
     switch( gameStatus ){
+        case STATUS_END_INIT_SCENE:
+            gameStartCount = GAME_START_COUNT_DOWN_SEC;
+            gameStatus = STATUS_GAME_START_COUNT_DOWN;
+            break;
+        case STATUS_GAME_START_COUNT_DOWN:
+            gameStartCount -= dt;
+            if (gameStartCount > 0)
+            {
+                CCString* statusString = CCString::createWithFormat("%1.0f", gameStartCount);
+                statusLabel->setString(statusString->getCString());
+            } else {
+                gameTimerCount = GAME_TIME_LIMIT;
+                gameStatus = STATUS_GAME_START_COUNT_DOWN_END;
+            }
+            break;
+        case STATUS_GAME_START_COUNT_DOWN_END:
+            gameStatus = STATUS_TAP_READY;
+            break;
+        case STATUS_TAP_READY:
+            if(gameTimerCount < 0){
+                gameStatus = STATUS_GAME_TIME_LIMIT;
+            }
+            break;
         case STATUS_TAP_START:
             if(location.x >= PANEL_CENTER_POINT.x - ((floor(FIELD_WIDTH / 2) + 0.5) * panelSize.width) &&
                location.x < PANEL_CENTER_POINT.x + ((floor(FIELD_WIDTH / 2) + 0.5) * panelSize.width) &&
@@ -111,6 +154,9 @@ void GameScene::update(float dt)
             }
             break;
         case STATUS_HOLD_PANEL:
+            if(gameTimerCount < 0){
+                gameStatus = STATUS_CHECK_DELETE;
+            }
             moveHoldingPanel();
             break;
         case STATUS_HOLD_END:
@@ -140,6 +186,10 @@ void GameScene::update(float dt)
         case STATUS_DELETE_PANEL:
             gameStatus = STATUS_WAIT_PROCESS;
             comboCounter += field->comboCount;
+            if(maxCombo < comboCounter)
+            {
+                maxCombo = comboCounter;
+            }
             tmpScore += field->deletePanelCount * comboCounter;
             field->deleteMainField();
             deletePanel();
@@ -149,6 +199,9 @@ void GameScene::update(float dt)
             field->createDropField();
             field->dropMainField();
             dropPanel();
+            break;
+        case STATUS_GAME_TIME_LIMIT:
+            makeResult();
             break;
     }
 }
@@ -188,7 +241,7 @@ void GameScene::ccTouchMoved(CCTouch* pTouch, CCEvent* pEvent)
 
 void GameScene::ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent)
 {
-    if(gameStatus < STATUS_HOLD_PANEL)
+    if(gameStatus > STATUS_TAP_READY && gameStatus < STATUS_HOLD_PANEL)
     {
         gameStatus = STATUS_TAP_READY;
     }
@@ -227,7 +280,6 @@ void GameScene::initPanel()
             CCSpriteBatchNode* panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex(field->getFieldValue(x,y));
             CCSprite* panelSprite = CCSprite::createWithTexture(panelNode->getTexture());
             panelSprite->setPosition(getPanelPosition(x,y));
-            panelSprite->setTag(x * 10 + y);
             panelSpriteArray[x][y] = panelSprite;
             this->addChild(panelSpriteArray[x][y]);
         }
@@ -236,7 +288,7 @@ void GameScene::initPanel()
 
 void GameScene::deletePanel()
 {
-    SimpleAudioEngine::sharedEngine()->playEffect("delete_panel.wav");
+    sound->playDeletePanelSound();
     for (int x = 0; x < FIELD_WIDTH; x++)
     {
         for (int y = 0; y < FIELD_HEIGHT; y++)
@@ -404,19 +456,30 @@ void GameScene::getPanelCoordinateByLocation(int posX, int posY, int &x, int &y)
     {
         x = std::min(FIELD_WIDTH -1 ,std::max(0,int(round(diffX)) + int(floor(FIELD_WIDTH / 2.0))));
     } else {
-        //TODO 偶数の時の計算
+        x = std::min(FIELD_WIDTH -1 ,std::max(0,int(floor(diffX + floor(FIELD_WIDTH / 2.0)))));
     }
     if (FIELD_HEIGHT % 2 == 1)
     {
         y = std::min(FIELD_HEIGHT -1, std::max(0,int(round(diffY)) + int(floor(FIELD_HEIGHT / 2.0))));
     } else {
-        //TODO 偶数の時の計算
+        y = std::min(FIELD_HEIGHT -1 ,std::max(0,int(floor(diffY + floor(FIELD_HEIGHT / 2.0)))));
     }
 }
 
 CCPoint GameScene::getPanelPosition(int x, int y)
 {
     return ccp(PANEL_CENTER_POINT.x + (x + 0.5 - (FIELD_WIDTH / 2.0)) * panelSize.width, PANEL_CENTER_POINT.y + (y + 0.5 - (FIELD_HEIGHT / 2.0)) * panelSize.height);
+}
+
+void GameScene::makeResult()
+{
+    CCLog ("debug:makeResult");
+    gameStatus = STATUS_RESULT_VIEW;
+    ResultLayer *layer = ResultLayer::create();
+
+    layer->setResult(totalScore, maxCombo);
+    layer->makeResult();
+    this->addChild(layer, kZOrder_Result);
 }
 
 void GameScene::menuCloseCallback(CCObject* pSender)
