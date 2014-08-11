@@ -14,14 +14,16 @@ protected:
 
     int score;
     int maxCombo;
+    int deletePanelCount;
 
 public:
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();
 
-    void setResult(int score, int maxCombo);
+    void setResult(int score, int maxCombo, int deletePanelCount);
     void makeResult();
+    void playCallback(CCObject* pSender);
 
     // implement the "static node()" method manually
     CREATE_FUNC(ResultLayer);

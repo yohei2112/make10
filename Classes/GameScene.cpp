@@ -39,6 +39,7 @@ bool GameScene::init()
     tmpScore = 0;
     comboCounter = 0;
     maxCombo = 0;
+    deletePanelCounter = 0;
     gameTimerCount = GAME_TIME_LIMIT;
 
     gameStatus = STATUS_INIT_GAME;
@@ -102,7 +103,7 @@ void GameScene::updateGameTimer(float dt)
     {
         return;
     }
-    if (gameStatus < STATUS_GAME_TIME_LIMIT)
+    if (gameStatus < STATUS_GAME_TIME_LIMIT && gameStatus != STATUS_WAIT_PROCESS)
     {
         gameTimerCount -= dt;
     }
@@ -190,6 +191,7 @@ void GameScene::update(float dt)
             {
                 maxCombo = comboCounter;
             }
+            deletePanelCounter += field->deletePanelCount;
             tmpScore += field->deletePanelCount * comboCounter;
             field->deleteMainField();
             deletePanel();
@@ -477,7 +479,7 @@ void GameScene::makeResult()
     gameStatus = STATUS_RESULT_VIEW;
     ResultLayer *layer = ResultLayer::create();
 
-    layer->setResult(totalScore, maxCombo);
+    layer->setResult(totalScore, maxCombo, deletePanelCounter);
     layer->makeResult();
     this->addChild(layer, kZOrder_Result);
 }

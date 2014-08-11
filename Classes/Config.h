@@ -16,7 +16,7 @@
 
 #define HOLD_PANEL_LIMIT 3.0
 
-#define GAME_TIME_LIMIT 10.0
+#define GAME_TIME_LIMIT 30.0
 
 //TODO ステータスの名前見直し、次の処理を知らなくてもいい名前に。STATUS_CHECK_DELETE → STATUS_END_HOLD
 enum status
