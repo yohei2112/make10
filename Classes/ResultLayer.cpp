@@ -51,14 +51,15 @@ void ResultLayer::makeResult()
     CCSprite* playButton = CCSprite::create("play_button.png");
     CCSprite* playButtonPushed = CCSprite::create("play_button.png");
     playButtonPushed->setColor(ccc3(64,64,64));
- 
-    //メニューアイテムの作成
+
     CCMenuItemSprite* replayButtonItem = CCMenuItemSprite::create(playButton, playButtonPushed, this, menu_selector(ResultLayer::playCallback));
 
-    //メニューの作成　pBtnの中にpBtnItemを入れる
-    CCMenu* replayButton = CCMenu::create(replayButtonItem, NULL);
-     
-    //pBtnを画面中央に配置
+    CCMenuItemLabel *restartLabelItem = CCMenuItemFont::create("再プレイ", this, menu_selector(ResultLayer::playCallback));
+    restartLabelItem->setColor(ccc3(0,0,0));
+
+    CCMenu* replayButton = CCMenu::create(restartLabelItem, NULL);
+    replayButton->alignItemsVerticallyWithPadding(50);
+
     replayButton->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.35));
     this->addChild(replayButton);
 }

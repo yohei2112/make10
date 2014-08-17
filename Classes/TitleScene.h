@@ -33,9 +33,9 @@ public:
     static cocos2d::CCScene* scene();
     
     // a selector callback
-    void menuCloseCallback(CCObject* pSender);
+    void playCallback(CCObject* pSender);
 
-    void makeBackground();
+    void makeTitle();
 
     // implement the "static node()" method manually
     CREATE_FUNC(TitleScene);

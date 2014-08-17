@@ -63,6 +63,12 @@ bool GameScene::init()
     statusLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height - statusLabel->getContentSize().height * 0.5));
     this->addChild(statusLabel, kZOrder_Score);
 
+    CCString* scoreString = CCString::createWithFormat("score:%d", totalScore);
+    scoreLabel = CCLabelTTF::create(scoreString->getCString(), "", NUMBER_FONT_SIZE);
+    scoreLabel->setPosition(ccp(WIN_SIZE.width - scoreLabel->getContentSize().width * 0.5, WIN_SIZE.height - scoreLabel->getContentSize().height * 0.5));
+    this->addChild(scoreLabel, kZOrder_Score);
+
+
 
     field = new Field();
     action = new Action();
@@ -113,7 +119,7 @@ void GameScene::updateGameTimer(float dt)
     }
 
 //    CCString* statusString = CCString::createWithFormat("score:%d\ncombo:%d tmpScore:%d\nstatus:%02d\ntimer:%2.2f", totalScore, comboCounter,tmpScore, gameStatus, gameTimerCount);
-    CCString* statusString = CCString::createWithFormat("status:%02d\ntimer:%2.2f", gameStatus,gameTimerCount);
+    CCString* statusString = CCString::createWithFormat("time:%2.1f", gameTimerCount);
     statusLabel->setString(statusString->getCString());
 
 }
@@ -178,7 +184,6 @@ void GameScene::update(float dt)
             }
             else
             {
-                totalScore += tmpScore;
                 tmpScore = 0;
                 comboCounter = 0;
                 gameStatus = STATUS_TAP_READY;
@@ -193,6 +198,10 @@ void GameScene::update(float dt)
             }
             deletePanelCounter += field->deletePanelCount;
             tmpScore += field->deletePanelCount * comboCounter;
+            totalScore += tmpScore;
+            scoreLabel->setString(CCString::createWithFormat("score:%d", totalScore)->getCString());
+            scoreLabel->setPosition(ccp(WIN_SIZE.width - scoreLabel->getContentSize().width * 0.5, WIN_SIZE.height - scoreLabel->getContentSize().height * 0.5));
+
             field->deleteMainField();
             deletePanel();
             break;
@@ -476,6 +485,9 @@ CCPoint GameScene::getPanelPosition(int x, int y)
 void GameScene::makeResult()
 {
     CCLog ("debug:makeResult");
+
+    CCString* statusString = CCString::createWithFormat("time:%2.1f", 0.0);
+    statusLabel->setString(statusString->getCString());
     gameStatus = STATUS_RESULT_VIEW;
     ResultLayer *layer = ResultLayer::create();
 

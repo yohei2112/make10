@@ -36,7 +36,7 @@ bool TitleScene::init()
         return false;
     }
 
-    makeBackground();
+    makeTitle();
 
     return true;
 }
@@ -69,18 +69,37 @@ void TitleScene::ccTouchMoved(CCTouch* pTouch, CCEvent* pEvent)
 
 void TitleScene::ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent)
 {
-
-    CCDirector::sharedDirector()->replaceScene(GameScene::scene());
     return;
 
 }
 
-void TitleScene::makeBackground()
+void TitleScene::makeTitle()
 {
     background = CCSprite::create("background.png");
     background->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
     this->addChild(background);
     CCSprite* titleSprite = CCSprite::create("title.png");
-    titleSprite->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
+    titleSprite->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.7));
     this->addChild(titleSprite);
+
+    CCLabelTTF* playMenuLabel = CCLabelTTF::create("play", "", NUMBER_FONT_SIZE);
+
+
+    CCMenuItemLabel *startLabelItem = CCMenuItemLabel::create(playMenuLabel, this, menu_selector(TitleScene::playCallback));
+
+
+//    CCMenuItemLabel *startLabelItem = CCMenuItemFont::create("PLAY", this, menu_selector(TitleScene::playCallback));
+    startLabelItem->setColor(ccc3(0,0,0));
+
+    CCMenu* menu = CCMenu::create(startLabelItem, NULL);
+
+    menu->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.35));
+    this->addChild(menu);
+
+}
+
+
+void TitleScene::playCallback(CCObject* pSender)
+{
+    CCDirector::sharedDirector()->replaceScene(GameScene::scene());
 }

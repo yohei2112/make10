@@ -47,6 +47,8 @@ protected:
     CCLabelTTF* versionLabel;
     CCLabelTTF* statusLabel;
     CCLabelTTF* resultLabel;
+    CCLabelTTF* scoreLabel;
+    CCLabelTTF* comboLabel;
     CCSprite* background;
     CCSprite* mask;
     CCSprite* title;
