@@ -28,6 +28,8 @@ import org.cocos2dx.lib.Cocos2dxGLSurfaceView;
 
 import com.google.ads.*;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -94,4 +96,15 @@ public class make10 extends Cocos2dxActivity{
     		}
     	});
     }
+
+    public static void openTweetDialog(String tweet)
+    {
+
+    	String url = String.format("http://twitter.com/share?text=%s", tweet);
+    	url = url.replaceAll("#", "%23");
+    	
+    	Intent i = new Intent(Intent.ACTION_VIEW,Uri.parse(url));
+        me.startActivity(i);
+    }
+    
 }

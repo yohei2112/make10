@@ -76,6 +76,7 @@ protected:
     int totalScore;
     int tmpScore;
     int comboCounter;
+    int totalCombo;
     int maxCombo;
     int deletePanelCounter;
     float gameTimerCount;

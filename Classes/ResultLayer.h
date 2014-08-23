@@ -9,11 +9,15 @@ class ResultLayer : public cocos2d::CCLayer
 {
 
 protected:
-    CCLabelTTF* resultLabel;
+    CCLabelTTF* resultTotalComboLabel;
+    CCLabelTTF* resultMaxComboLabel;
+    CCLabelTTF* resultDeletePanelLabel;
+    CCLabelTTF* resultTotalScoreLabel;
     CCSprite* resultBack;
 
     int score;
     int maxCombo;
+    int totalCombo;
     int deletePanelCount;
 
 public:
@@ -21,9 +25,10 @@ public:
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();
 
-    void setResult(int score, int maxCombo, int deletePanelCount);
+    void setResult(int score, int totalCombo, int maxCombo, int deletePanelCount);
     void makeResult();
     void playCallback(CCObject* pSender);
+    void tweetCallback(CCObject* pSender);
 
     // implement the "static node()" method manually
     CREATE_FUNC(ResultLayer);

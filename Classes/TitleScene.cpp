@@ -6,6 +6,7 @@
 
 #define ENABLE_ADMOB
 #include "AdMobUtil.h"
+#include "TwitterUtil.h"
 
 #endif
 

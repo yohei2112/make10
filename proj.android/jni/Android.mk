@@ -14,7 +14,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/Field.cpp \
                    ../../Classes/Action.cpp \
                    ../../Classes/Sound.cpp \
-                   ../../Classes/AdMobUtil.cpp
+                   ../../Classes/AdMobUtil.cpp \
+                   ../../Classes/TwitterUtil.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 
