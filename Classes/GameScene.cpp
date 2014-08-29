@@ -36,6 +36,10 @@ bool GameScene::init()
         return false;
     }
 
+#ifdef ENABLE_ADMOB
+    AdMobUtil::hideAdView();
+#endif
+
     totalScore = 0;
     tmpScore = 0;
     comboCounter = 0;
@@ -60,9 +64,16 @@ bool GameScene::init()
     holdingPanel->setVisible(false);
     this->addChild(holdingPanel, kZOrder_HoldPanel);
 
-    statusLabel = CCLabelTTF::create("0", "", NUMBER_FONT_SIZE * 2);
-    statusLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height - statusLabel->getContentSize().height));
+    statusLabel = CCLabelTTF::create("00.0", "", NUMBER_FONT_SIZE * 2);
+    statusLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height - statusLabel->getContentSize().height * 1.5));
+    statusLabel->setColor(ccc3(0,0,0));
     this->addChild(statusLabel, kZOrder_Score);
+
+    CCSprite* timerLabelBack = CCSprite::create();
+    timerLabelBack->setTextureRect(CCRectMake(0, 0, statusLabel->getContentSize().width * 1.2 , statusLabel->getContentSize().height * 1.1));
+    timerLabelBack->setColor(ccc3(255,255,255));
+    timerLabelBack->setPosition(statusLabel->getPosition());
+    this->addChild(timerLabelBack, kZOrder_ScoreBack);
 
     CCString* scoreString = CCString::createWithFormat("score:%d", totalScore);
     scoreLabel = CCLabelTTF::create(scoreString->getCString(), "", round(NUMBER_FONT_SIZE / 2));
@@ -74,6 +85,10 @@ bool GameScene::init()
     comboLabel->setVisible(false);
     this->addChild(comboLabel, kZOrder_Score);
 
+    extendTimerLabel = CCLabelTTF::create("0", "", NUMBER_FONT_SIZE);
+    extendTimerLabel->setPosition(ccp(statusLabel->getPosition().x + statusLabel->getContentSize().width * 0.5 + extendTimerLabel->getContentSize().width * 0.5, statusLabel->getPosition().y - statusLabel->getContentSize().height * 0.5 + extendTimerLabel->getContentSize().height * 0.5));
+    extendTimerLabel->setVisible(false);
+    this->addChild(extendTimerLabel, kZOrder_Score);
 
     field = new Field();
     action = new Action();
@@ -155,6 +170,7 @@ void GameScene::update(float dt)
             gameStatus = STATUS_TAP_READY;
             break;
         case STATUS_TAP_READY:
+            extendTimerLabel->setVisible(false);
             comboLabel->setVisible(false);
             if(gameTimerCount < 0){
                 gameStatus = STATUS_GAME_TIME_LIMIT;
@@ -195,12 +211,35 @@ void GameScene::update(float dt)
             {
                 tmpScore = 0;
                 comboCounter = 0;
+                if(extendTimerCount > 0)
+                {
+                    gameTimerCount += extendTimerCount;
+                }
+                extendTimerCount = 0;
                 gameStatus = STATUS_TAP_READY;
             }
             break;
         case STATUS_DELETE_PANEL:
             {
                 gameStatus = STATUS_WAIT_PROCESS;
+                if (field->deletePanelCount > 14)
+                {
+                    extendTimerCount += 10;
+                }
+                else if (field->deletePanelCount > 9)
+                {
+                    extendTimerCount += 5;
+                }
+                if (field->comboCount > 2)
+                {
+                    extendTimerCount += (field->comboCount - 2) ^ 2;
+                }
+                if (extendTimerCount > 0)
+                {
+                    extendTimerLabel->setString(CCString::createWithFormat("+%dsec", extendTimerCount)->getCString());
+                    extendTimerLabel->setPosition(ccp(statusLabel->getPosition().x + statusLabel->getContentSize().width * 0.5 + extendTimerLabel->getContentSize().width * 0.5, extendTimerLabel->getPosition().y));
+                    extendTimerLabel->setVisible(true);
+                }
                 comboCounter += field->comboCount;
                 if(maxCombo < comboCounter)
                 {
@@ -208,7 +247,7 @@ void GameScene::update(float dt)
                 }
                 totalCombo += field->comboCount;
                 deletePanelCounter += field->deletePanelCount;
-                tmpScore += field->deletePanelCount * comboCounter;
+//                tmpScore += field->deletePanelCount * comboCounter;
                 totalScore += tmpScore;
                 CCString* scoreString = CCString::createWithFormat("score:%d\ntotalCombo:%d", totalScore, totalCombo);
                 scoreLabel->setString(scoreString->getCString());
@@ -345,7 +384,7 @@ void GameScene::endDelete()
 
 void GameScene::dropPanel()
 {
-    SimpleAudioEngine::sharedEngine()->playEffect("drop_panel.wav");
+    sound->playDropPanelSound();
     isDrop = true;
     int dropCount;
     dropPanelCount = 0;
@@ -469,7 +508,7 @@ void GameScene::moveHoldingPanel()
         panelSpriteArray[holdPanelX][holdPanelY] = tmpSprite;
         holdPanelX = posX;
         holdPanelY = posY;
-        SimpleAudioEngine::sharedEngine()->playEffect("move_panel.wav");
+        sound->playMovePanelSound();
     }
 
 }
@@ -503,12 +542,12 @@ void GameScene::makeResult()
 {
     CCLog ("debug:makeResult");
 
-    CCString* statusString = CCString::createWithFormat("game over");
+    CCString* statusString = CCString::createWithFormat("0.0");
     statusLabel->setString(statusString->getCString());
     gameStatus = STATUS_RESULT_VIEW;
     ResultLayer *layer = ResultLayer::create();
 
-    layer->setResult(totalScore * totalCombo * maxCombo * deletePanelCounter, totalCombo, maxCombo, deletePanelCounter);
+    layer->setResult(totalCombo * maxCombo * deletePanelCounter, totalCombo, maxCombo, deletePanelCounter);
     layer->makeResult();
     this->addChild(layer, kZOrder_Result);
 }

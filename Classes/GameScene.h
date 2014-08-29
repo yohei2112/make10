@@ -37,6 +37,7 @@ protected:
         kZOrder_HoldPanel,
         kZOrder_PanelLabel,
         kZOrder_PanelMask,
+        kZOrder_ScoreBack,
         kZOrder_Score,
         kZOrder_PlayButton,
         kZOrder_GameOver,
@@ -49,6 +50,7 @@ protected:
     CCLabelTTF* resultLabel;
     CCLabelTTF* scoreLabel;
     CCLabelTTF* comboLabel;
+    CCLabelTTF* extendTimerLabel;
     CCSprite* background;
     CCSprite* mask;
     CCSprite* title;
@@ -79,6 +81,7 @@ protected:
     int totalCombo;
     int maxCombo;
     int deletePanelCounter;
+    int extendTimerCount;
     float gameTimerCount;
     float holdPanelTimerCount;
     float gameStartCount;

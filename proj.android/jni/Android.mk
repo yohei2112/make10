@@ -11,6 +11,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/GameScene.cpp \
                    ../../Classes/TitleScene.cpp \
                    ../../Classes/ResultLayer.cpp \
+                   ../../Classes/HowToPlayLayer.cpp \
+                   ../../Classes/ConfigLayer.cpp \
                    ../../Classes/Field.cpp \
                    ../../Classes/Action.cpp \
                    ../../Classes/Sound.cpp \

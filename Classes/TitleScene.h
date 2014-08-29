@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "Config.h"
 #include "SimpleAudioEngine.h"
+#include "HowToPlayLayer.h"
+#include "ConfigLayer.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -34,8 +36,11 @@ public:
     
     // a selector callback
     void playCallback(CCObject* pSender);
+    void howToPlayCallback(CCObject* pSender);
+    void configCallback(CCObject* pSender);
 
     void makeTitle();
+    void makeBackground();
 
     // implement the "static node()" method manually
     CREATE_FUNC(TitleScene);

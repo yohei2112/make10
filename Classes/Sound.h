@@ -7,9 +7,14 @@ USING_NS_CC;
 
 class Sound
 {
+protected:
+    bool isSoundEnable;
+
 public:
     Sound();
     void playDeletePanelSound();
+    void playDropPanelSound();
+    void playMovePanelSound();
 
 };
 
