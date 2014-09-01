@@ -70,7 +70,6 @@ void Field::checkAdjoinSameNumField()
             Field::initCheckedAdjoinSameNumField();
             Field::checkAdjoinSameNum(x, y);
             adjoinSameNumField[x][y] = adjoinSameNumCount;
-            CCLog ("debug:adjoinSameNumField[%d][%d] = %d", x,y,adjoinSameNumCount);
         }
     }
 }
@@ -137,7 +136,6 @@ void Field::createDeleteField()
             } else {
                 deleteField[x][y] = 0;
             }
-            CCLog ("debug:deleteField[%d][%d] = %d", x,y,deleteField[x][y]);
         }
     }
 
@@ -174,7 +172,6 @@ void Field::createDropField()
         for (int x = 0; x < FIELD_WIDTH; x++)
         {
             dropField[x][y] = Field::getDropCount(x,y);
-            CCLog ("debug:dropField[%d][%d] = %d", x,y,dropField[x][y]);
         }
     }
 }
@@ -188,7 +185,6 @@ void Field::dropMainField()
             if (dropField[x][y] > 0)
             {
                 field[x][y - dropField[x][y]] = field[x][y];
-                CCLog ("debug:drop field [%d][%d] => [%d][%d] %d", x,y,x,y - dropField[x][y],field[x][y]);
                 field[x][y] = (arc4random() % PANEL_TYPE_NUM) + 1;
             }
         }

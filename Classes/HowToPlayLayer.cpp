@@ -6,13 +6,16 @@ USING_NS_CC;
 // on "init" you need to initialize your instance
 bool HowToPlayLayer::init()
 {
-    CCLog ("debug:HowToPlayLayer::init");
     //////////////////////////////
     // 1. super init first
     if ( !CCLayer::init() )
     {
         return false;
     }
+
+    this->setTouchEnabled(true);
+    this->setTouchMode(kCCTouchesOneByOne);
+    this->setTouchPriority(kCCMenuHandlerPriority);
 
     howToPlaySprite = CCSprite::create("howtoplay.png");
     howToPlaySprite->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));

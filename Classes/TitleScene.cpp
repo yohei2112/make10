@@ -38,6 +38,7 @@ bool TitleScene::init()
     }
 
     makeTitle();
+    setKeypadEnabled( true );
 
     return true;
 }
@@ -49,16 +50,21 @@ void TitleScene::onEnter()
 
     this->setTouchEnabled(true);
     this->setTouchMode(kCCTouchesOneByOne);
-
+    this->schedule(schedule_selector(TitleScene::addBackgroundPanelTimer), 0.5);
 }
 
 void TitleScene::update(float dt)
 {
 }
 
+void TitleScene::addBackgroundPanelTimer(float dt)
+{
+    addBackgroundPanel();
+}
 
 bool TitleScene::ccTouchBegan(CCTouch* pTouch, CCEvent* pEvent)
 {
+    addBackgroundPanel();
     return true;
 }
 
@@ -76,24 +82,37 @@ void TitleScene::ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent)
 
 void TitleScene::makeTitle()
 {
+    panelNodeArray = CCArray::createWithCapacity(PANEL_TYPE_NUM + 1);
+    panelNodeArray->retain();
+    CCString* panelNodeString;
+    for (int i = 0; i <= PANEL_TYPE_NUM; i++)
+    {
+        panelNodeString = CCString::createWithFormat("panel_%d.png", i);
+        panelNodeArray->insertObject(CCSpriteBatchNode::create(panelNodeString->getCString()), i);
+        this->addChild((CCSpriteBatchNode*)panelNodeArray->objectAtIndex(i));
+    }
 
-    makeBackground();
+    addBackgroundPanel();
 
     background = CCSprite::create("background.png");
     background->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
+    this->addChild(background, kZOrder_Background);
 
     CCSprite* titleSprite = CCSprite::create("title.png");
     titleSprite->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.7));
-    this->addChild(titleSprite);
+    this->addChild(titleSprite, kZOrder_TitleLogo);
 
     CCLabelTTF* playMenuLabel = CCLabelTTF::create("PLAY", "", NUMBER_FONT_SIZE);
     CCMenuItemLabel *startLabelItem = CCMenuItemLabel::create(playMenuLabel, this, menu_selector(TitleScene::playCallback));
+    startLabelItem->setColor(ccc3(0,0,0));
 
     CCLabelTTF* howToPlayMenuLabel = CCLabelTTF::create("HOW TO PLAY", "", NUMBER_FONT_SIZE);
     CCMenuItemLabel *howToPlayLabelItem = CCMenuItemLabel::create(howToPlayMenuLabel, this, menu_selector(TitleScene::howToPlayCallback));
+    howToPlayMenuLabel->setColor(ccc3(0,0,0));
 
     CCLabelTTF* configMenuLabel = CCLabelTTF::create("CONFIG", "", NUMBER_FONT_SIZE);
     CCMenuItemLabel *configLabelItem = CCMenuItemLabel::create(configMenuLabel, this, menu_selector(TitleScene::configCallback));
+    configMenuLabel->setColor(ccc3(0,0,0));
 
 //    CCMenuItemLabel *startLabelItem = CCMenuItemFont::create("PLAY", this, menu_selector(TitleScene::playCallback));
 
@@ -101,7 +120,11 @@ void TitleScene::makeTitle()
     menu->alignItemsVerticallyWithPadding(10);
 
     menu->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.35));
-    this->addChild(menu);
+    this->addChild(menu, kZOrder_TitleMenu);
+
+    CCSprite* titleMenuBackSprite = CCSprite::create("title_menu_back.png");
+    titleMenuBackSprite->setPosition(menu->getPosition());
+    this->addChild(titleMenuBackSprite, kZOrder_TitleMenuBack);
 
 #ifdef ENABLE_ADMOB
     AdMobUtil::showAdView();
@@ -119,43 +142,44 @@ void TitleScene::howToPlayCallback(CCObject* pSender)
 {
     HowToPlayLayer *layer = HowToPlayLayer::create();
 
-    this->addChild(layer);
+    this->addChild(layer, kZOrder_AddLayer, kTag_howToPlayLayer);
 }
 
 
 void TitleScene::configCallback(CCObject* pSender)
 {
     ConfigLayer *layer = ConfigLayer::create();
-
-    this->addChild(layer);
+    this->addChild(layer, kZOrder_AddLayer, kTag_configLayer);
 }
 
-void TitleScene::makeBackground()
+void TitleScene::addBackgroundPanel()
 {
-    CCArray* panelNodeArray = CCArray::create();
-    CCString* panelNodeString;
-    for (int i = 0; i <= PANEL_TYPE_NUM; i++)
-    {
-        panelNodeString = CCString::createWithFormat("panel_%d.png", i);
-        panelNodeArray->addObject(CCSpriteBatchNode::create(panelNodeString->getCString()));
-        this->addChild((CCSpriteBatchNode*)panelNodeArray->objectAtIndex(i));
-    }
-
-    CCSpriteBatchNode* panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex(1);
+    CCSpriteBatchNode* panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex((arc4random() % PANEL_TYPE_NUM) + 1);
     CCSprite* panelSprite = CCSprite::createWithTexture(panelNode->getTexture());
+    panelSprite->setPosition(ccp(arc4random() % (int)WIN_SIZE.width, WIN_SIZE.height + panelSprite->getContentSize().height));
 
-    int backgroundPanelCountX = (int) ceil(WIN_SIZE.width / panelSprite->getContentSize().width);
-    int backgroundPanelCountY = (int) ceil(WIN_SIZE.height / panelSprite->getContentSize().height);
+    this->addChild(panelSprite, kZOrder_BackgroundPanel);
 
-    for (int x = 0; x < backgroundPanelCountX + 1; x++)
+    panelSprite->runAction(Action::getTitleBackPanelAction());
+}
+
+void TitleScene::keyBackClicked()
+{
+    CCNode* node = this->getChildByTag(kTag_howToPlayLayer);
+    if(node != NULL)
     {
-        for (int y = 0; y < backgroundPanelCountY + 1; y++)
+        this->removeChildByTag(kTag_howToPlayLayer);
+    }
+    else
+    {
+        node = this->getChildByTag(kTag_configLayer);
+        if(node != NULL)
         {
-            panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex((arc4random() % PANEL_TYPE_NUM) + 1);
-            panelSprite = CCSprite::createWithTexture(panelNode->getTexture());
-            panelSprite->setPosition(ccp(panelSprite->getContentSize().width * x + 10, panelSprite->getContentSize().height * y + 10));
-            this->addChild(panelSprite);
+            this->removeChildByTag(kTag_configLayer);
+        }
+        else
+        {
+            CCDirector::sharedDirector()->end();
         }
     }
 }
-

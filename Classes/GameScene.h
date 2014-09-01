@@ -46,7 +46,7 @@ protected:
     };
 
     CCLabelTTF* versionLabel;
-    CCLabelTTF* statusLabel;
+    CCLabelTTF* timerLabel;
     CCLabelTTF* resultLabel;
     CCLabelTTF* scoreLabel;
     CCLabelTTF* comboLabel;

@@ -22,6 +22,7 @@ bool ResultLayer::init()
         return false;
     }
 
+    setKeypadEnabled( true );
     score = 0;
     maxCombo = 0;
 
@@ -64,27 +65,25 @@ void ResultLayer::makeResult()
     userDefault->setIntegerForKey("deletePanelCountSumRecord", deletePanelCountSumRecord + deletePanelCount);
     userDefault->setIntegerForKey("playCountSumRecord", playCountSumRecord + 1);
 
-
-    CCLog ("debug:makeResult");
-    CCString* resultTotalComboString = CCString::createWithFormat("total\ncombo\n%d", totalCombo);
+    CCString* resultTotalComboString = CCString::createWithFormat("合計\nコンボ\n%d", totalCombo);
     resultTotalComboLabel = CCLabelTTF::create(resultTotalComboString->getCString(), "", round(NUMBER_FONT_SIZE * 0.7));
     resultTotalComboLabel->setPosition(ccp(WIN_SIZE.width * 0.27, WIN_SIZE.height * 0.55));
     resultTotalComboLabel->setColor(ccc3(0,0,0));
     this->addChild(resultTotalComboLabel);
 
-    CCString* resultMaxComboString = CCString::createWithFormat("max\ncombo\n%d", maxCombo);
+    CCString* resultMaxComboString = CCString::createWithFormat("最大\nコンボ\n%d", maxCombo);
     resultMaxComboLabel = CCLabelTTF::create(resultMaxComboString->getCString(), "", round(NUMBER_FONT_SIZE * 0.7));
     resultMaxComboLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.55));
     resultMaxComboLabel->setColor(ccc3(0,0,0));
     this->addChild(resultMaxComboLabel);
 
-    CCString* resultDeletePanelString = CCString::createWithFormat("delete\npanel\n%d", deletePanelCount);
+    CCString* resultDeletePanelString = CCString::createWithFormat("消した\nパネル\n%d", deletePanelCount);
     resultDeletePanelLabel = CCLabelTTF::create(resultDeletePanelString->getCString(), "", round(NUMBER_FONT_SIZE * 0.7));
     resultDeletePanelLabel->setPosition(ccp(WIN_SIZE.width * 0.73, WIN_SIZE.height * 0.55));
     resultDeletePanelLabel->setColor(ccc3(0,0,0));
     this->addChild(resultDeletePanelLabel);
 
-    CCString* resultTotalScoreString = CCString::createWithFormat("score\n%d", score);
+    CCString* resultTotalScoreString = CCString::createWithFormat("スコア\n%d", score);
     resultTotalScoreLabel = CCLabelTTF::create(resultTotalScoreString->getCString(), "", NUMBER_FONT_SIZE);
     resultTotalScoreLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.4));
     resultTotalScoreLabel->setColor(ccc3(0,0,0));
@@ -107,7 +106,7 @@ void ResultLayer::makeResult()
     restartLabelItem->setColor(ccc3(0,0,0));
 
     CCMenu* resultMenu = CCMenu::create(replayButtonItem, NULL);
-//    resultMenu->addChild(tweetButtonItem);
+    resultMenu->addChild(tweetButtonItem);
     resultMenu->alignItemsHorizontallyWithPadding(10);
     resultMenu->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.2));
     this->addChild(resultMenu);
@@ -139,6 +138,12 @@ void ResultLayer::playCallback(CCObject* pSender)
 
 void ResultLayer::tweetCallback(CCObject* pSender)
 {
-    CCString* tweetMessageString = CCString::createWithFormat("まっちんで%d点を記録しました。合計コンボ:%d,最大コンボ%d,消したパネル数%d #まっちん", score, totalCombo, maxCombo, deletePanelCount);
+    CCString* tweetMessageString = CCString::createWithFormat("MatchNで%d点を記録しました。合計コンボ:%d、最大コンボ%d、消したパネル%d #MatchN", score, totalCombo, maxCombo, deletePanelCount);
     TwitterUtil::openTweetDialog(tweetMessageString->getCString());
 }
+
+void ResultLayer::keyBackClicked()
+{
+    CCDirector::sharedDirector()->replaceScene(TitleScene::scene());
+}
+

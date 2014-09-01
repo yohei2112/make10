@@ -15,16 +15,36 @@ class TitleScene : public cocos2d::CCLayer
 
 protected:
 
+    enum kZOrder
+    {
+        kZOrder_Background,
+        kZOrder_TitleMenuBack,
+        kZOrder_BackgroundPanel,
+        kZOrder_TitleLogo,
+        kZOrder_TitleMenu,
+        kZOrder_AddLayer,
+    };
+
+    enum kTag
+    {
+        kTag_configLayer,
+        kTag_howToPlayLayer,
+    };
+
     CCSprite* background;
     CCSprite* mask;
     CCSprite* title;
+    CCArray *panelNodeArray;
 
     virtual void onEnter();
     virtual bool ccTouchBegan(CCTouch* pTouch, CCEvent* pEvent);
     virtual void ccTouchMoved(CCTouch* pTouch, CCEvent* pEvent);
     virtual void ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent);
 
+    void keyBackClicked();
+
     void update(float dt);
+    void addBackgroundPanelTimer(float dt);
 
 public:
 
@@ -40,7 +60,7 @@ public:
     void configCallback(CCObject* pSender);
 
     void makeTitle();
-    void makeBackground();
+    void addBackgroundPanel();
 
     // implement the "static node()" method manually
     CREATE_FUNC(TitleScene);

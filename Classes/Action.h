@@ -12,6 +12,7 @@ public:
     CCMoveBy* getDropPanelAction(int dropCount, CCSize panelSize);
     CCMoveTo* getMovePanelAction(int x,int y, CCSize panelSize);
     CCFadeTo* getDeletePanelAction();
+    static CCSequence* getTitleBackPanelAction();
 
 };
 

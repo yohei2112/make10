@@ -14,7 +14,6 @@ USING_NS_CC;
 // on "init" you need to initialize your instance
 bool ConfigLayer::init()
 {
-    CCLog ("debug:ConfigLayer::init");
     //////////////////////////////
     // 1. super init first
     if ( !CCLayer::init() )
@@ -22,21 +21,24 @@ bool ConfigLayer::init()
         return false;
     }
 
-    CCSprite* resultBack = CCSprite::create("result_back.png");
-    resultBack->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
-    this->addChild(resultBack);
+    this->setTouchEnabled(true);
+    this->setTouchMode(kCCTouchesOneByOne);
+    this->setTouchPriority(kCCMenuHandlerPriority);
+
+    CCSprite* configBackSprite = CCSprite::create("config_back.png");
+    configBackSprite->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
+    this->addChild(configBackSprite);
 
     CCSprite* closeButton = CCSprite::create("close_button.png");
     CCSprite* closeButtonPushed = CCSprite::create("close_button.png");
     closeButtonPushed->setColor(ccc3(64,64,64));
 
     CCMenuItemSprite* closeButtonItem = CCMenuItemSprite::create(closeButton, closeButtonPushed, this, menu_selector(ConfigLayer::closeCallback));
-    closeButtonItem->setPosition(ccp(WIN_SIZE.width - closeButton->getContentSize().width, WIN_SIZE.height - closeButton->getContentSize().height));
+    closeButtonItem->setPosition(ccp(configBackSprite->getPosition().x + configBackSprite->getContentSize().width * 0.5 - closeButton->getContentSize().width, configBackSprite->getPosition().y + configBackSprite->getContentSize().height * 0.5 - closeButton->getContentSize().height));
 
     CCMenu* menu = CCMenu::create(closeButtonItem, NULL);
     menu->setPosition(CCPointZero);
     this->addChild(menu);
-    CCLog ("debug:ConfigLayer::hoge");
 
     CCSprite* soundToggleOn = CCSprite::create("sound_toggle_on.png");
     CCSprite* soundToggleOnPushed = CCSprite::create("sound_toggle_on.png");
@@ -56,20 +58,14 @@ bool ConfigLayer::init()
         NULL
     );
     soundToggleMenuItem->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
-    CCLog ("debug:ConfigLayer::huga");
 
     CCUserDefault* userDefault = CCUserDefault::sharedUserDefault();
     bool isSoundEnable = userDefault->getBoolForKey("soundEnable", true);
 
     if (isSoundEnable == false)
     {
-        CCLog ("debug:ConfigLayer::soundEnable = false");
         soundToggleMenuItem->setSelectedIndex(1);
-    }else
-    {
-        CCLog ("debug:ConfigLayer::soundEnable = true");
     }
-    CCLog ("debug:ConfigLayer::piyo");
 
     CCMenu* soundToggleMenu = CCMenu::create(soundToggleMenuItem, NULL);
     soundToggleMenu->setPosition(CCPointZero);
@@ -91,14 +87,6 @@ void ConfigLayer::toggleSoundCallback(CCObject* pSender)
     bool isSoundEnable = userDefault->getBoolForKey("soundEnable", true);
 
     userDefault->setBoolForKey("soundEnable", !isSoundEnable);
-    if (isSoundEnable)
-    {
-        CCLog ("debug:ConfigLayer::set soundEnable = false");
-    }else
-    {
-        CCLog ("debug:ConfigLayer::set soundEnable = true");
-    }
-
 }
 
 

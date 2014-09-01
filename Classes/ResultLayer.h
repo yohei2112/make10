@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "config.h"
+#include "TitleScene.h"
 USING_NS_CC;
 
 class ResultLayer : public cocos2d::CCLayer
@@ -19,6 +20,8 @@ protected:
     int maxCombo;
     int totalCombo;
     int deletePanelCount;
+
+    void keyBackClicked();
 
 public:
 

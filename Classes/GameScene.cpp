@@ -64,21 +64,16 @@ bool GameScene::init()
     holdingPanel->setVisible(false);
     this->addChild(holdingPanel, kZOrder_HoldPanel);
 
-    statusLabel = CCLabelTTF::create("00.0", "", NUMBER_FONT_SIZE * 2);
-    statusLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height - statusLabel->getContentSize().height * 1.5));
-    statusLabel->setColor(ccc3(0,0,0));
-    this->addChild(statusLabel, kZOrder_Score);
+    timerLabel = CCLabelTTF::create("00.0", "", NUMBER_FONT_SIZE * 2);
+    timerLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height - timerLabel->getContentSize().height * 1));
+    timerLabel->setColor(ccc3(0,0,0));
+    this->addChild(timerLabel, kZOrder_Score);
 
     CCSprite* timerLabelBack = CCSprite::create();
-    timerLabelBack->setTextureRect(CCRectMake(0, 0, statusLabel->getContentSize().width * 1.2 , statusLabel->getContentSize().height * 1.1));
+    timerLabelBack->setTextureRect(CCRectMake(0, 0, timerLabel->getContentSize().width * 1.2 , timerLabel->getContentSize().height * 1.2));
     timerLabelBack->setColor(ccc3(255,255,255));
-    timerLabelBack->setPosition(statusLabel->getPosition());
+    timerLabelBack->setPosition(ccp(timerLabel->getPosition().x ,timerLabel->getPosition().y * 0.98));
     this->addChild(timerLabelBack, kZOrder_ScoreBack);
-
-    CCString* scoreString = CCString::createWithFormat("score:%d", totalScore);
-    scoreLabel = CCLabelTTF::create(scoreString->getCString(), "", round(NUMBER_FONT_SIZE / 2));
-    scoreLabel->setPosition(ccp(WIN_SIZE.width - scoreLabel->getContentSize().width * 0.5, WIN_SIZE.height - scoreLabel->getContentSize().height * 0.5));
-    this->addChild(scoreLabel, kZOrder_Score);
 
     comboLabel = CCLabelTTF::create("0", "", NUMBER_FONT_SIZE * 2);
     comboLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
@@ -86,8 +81,9 @@ bool GameScene::init()
     this->addChild(comboLabel, kZOrder_Score);
 
     extendTimerLabel = CCLabelTTF::create("0", "", NUMBER_FONT_SIZE);
-    extendTimerLabel->setPosition(ccp(statusLabel->getPosition().x + statusLabel->getContentSize().width * 0.5 + extendTimerLabel->getContentSize().width * 0.5, statusLabel->getPosition().y - statusLabel->getContentSize().height * 0.5 + extendTimerLabel->getContentSize().height * 0.5));
+    extendTimerLabel->setPosition(ccp(timerLabel->getPosition().x + extendTimerLabel->getContentSize().width * 0.5, timerLabel->getPosition().y - timerLabel->getContentSize().height * 0.5));
     extendTimerLabel->setVisible(false);
+    extendTimerLabel->setColor(ccc3(0,0,0));
     this->addChild(extendTimerLabel, kZOrder_Score);
 
     field = new Field();
@@ -139,10 +135,10 @@ void GameScene::updateGameTimer(float dt)
     }
     if (gameTimerCount < 0)
     {
-        statusLabel->setString("0.0");
+        timerLabel->setString("0.0");
     } else {
-        CCString* statusString = CCString::createWithFormat("%2.1f", gameTimerCount);
-        statusLabel->setString(statusString->getCString());
+        CCString* timerString = CCString::createWithFormat("%2.1f", gameTimerCount);
+        timerLabel->setString(timerString->getCString());
     }
 
 }
@@ -159,8 +155,8 @@ void GameScene::update(float dt)
             gameStartCount -= dt;
             if (gameStartCount > 0)
             {
-                CCString* statusString = CCString::createWithFormat("%1.0f", gameStartCount);
-                statusLabel->setString(statusString->getCString());
+                CCString* timerString = CCString::createWithFormat("%1.0f", gameStartCount);
+                timerLabel->setString(timerString->getCString());
             } else {
                 gameTimerCount = GAME_TIME_LIMIT;
                 gameStatus = STATUS_GAME_START_COUNT_DOWN_END;
@@ -237,7 +233,6 @@ void GameScene::update(float dt)
                 if (extendTimerCount > 0)
                 {
                     extendTimerLabel->setString(CCString::createWithFormat("+%dsec", extendTimerCount)->getCString());
-                    extendTimerLabel->setPosition(ccp(statusLabel->getPosition().x + statusLabel->getContentSize().width * 0.5 + extendTimerLabel->getContentSize().width * 0.5, extendTimerLabel->getPosition().y));
                     extendTimerLabel->setVisible(true);
                 }
                 comboCounter += field->comboCount;
@@ -249,9 +244,6 @@ void GameScene::update(float dt)
                 deletePanelCounter += field->deletePanelCount;
 //                tmpScore += field->deletePanelCount * comboCounter;
                 totalScore += tmpScore;
-                CCString* scoreString = CCString::createWithFormat("score:%d\ntotalCombo:%d", totalScore, totalCombo);
-                scoreLabel->setString(scoreString->getCString());
-                scoreLabel->setPosition(ccp(WIN_SIZE.width - scoreLabel->getContentSize().width * 0.5, WIN_SIZE.height - scoreLabel->getContentSize().height * 0.5));
 
                 comboLabel->setString(CCString::createWithFormat("combo:%d\n×\npanel:%d", comboCounter, field->deletePanelCount)->getCString());
                 comboLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));
@@ -427,9 +419,6 @@ void GameScene::setStatus(int status)
 
 void GameScene::resetPanelTexture()
 {
-    CCLog ("debug:resetPanelTexture");
-
-
     panelNodeArray = CCArray::create();
     CCString* panelNodeString;
     for (int i = 0; i <= PANEL_TYPE_NUM; i++)
@@ -443,7 +432,6 @@ void GameScene::resetPanelTexture()
     {
         for (int y = 0; y < FIELD_HEIGHT * 2; y++)
         {
-            CCLog ("debug:resetPanelTexture x = %d y = %d fieldValue = %d", x,y,field->getFieldValue(x,y));
             CCSpriteBatchNode* panelNode = (CCSpriteBatchNode*)panelNodeArray->objectAtIndex(field->getFieldValue(x,y));
             panelSpriteArray[x][y]->stopAllActions();
             panelSpriteArray[x][y]->setPosition(getPanelPosition(x,y));
@@ -540,10 +528,8 @@ CCPoint GameScene::getPanelPosition(int x, int y)
 
 void GameScene::makeResult()
 {
-    CCLog ("debug:makeResult");
-
-    CCString* statusString = CCString::createWithFormat("0.0");
-    statusLabel->setString(statusString->getCString());
+    CCString* timerString = CCString::createWithFormat("0.0");
+    timerLabel->setString(timerString->getCString());
     gameStatus = STATUS_RESULT_VIEW;
     ResultLayer *layer = ResultLayer::create();
 
@@ -563,3 +549,4 @@ void GameScene::menuCloseCallback(CCObject* pSender)
 #endif
 #endif
 }
+
