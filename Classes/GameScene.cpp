@@ -40,8 +40,6 @@ bool GameScene::init()
     AdMobUtil::hideAdView();
 #endif
 
-    totalScore = 0;
-    tmpScore = 0;
     comboCounter = 0;
     maxCombo = 0;
     totalCombo = 0;
@@ -205,7 +203,6 @@ void GameScene::update(float dt)
             }
             else
             {
-                tmpScore = 0;
                 comboCounter = 0;
                 if(extendTimerCount > 0)
                 {
@@ -228,7 +225,7 @@ void GameScene::update(float dt)
                 }
                 if (field->comboCount > 2)
                 {
-                    extendTimerCount += (field->comboCount - 2) ^ 2;
+                    extendTimerCount += (field->comboCount - 2) * (field->comboCount - 2);
                 }
                 if (extendTimerCount > 0)
                 {
@@ -242,8 +239,6 @@ void GameScene::update(float dt)
                 }
                 totalCombo += field->comboCount;
                 deletePanelCounter += field->deletePanelCount;
-//                tmpScore += field->deletePanelCount * comboCounter;
-                totalScore += tmpScore;
 
                 comboLabel->setString(CCString::createWithFormat("combo:%d\n×\npanel:%d", comboCounter, field->deletePanelCount)->getCString());
                 comboLabel->setPosition(ccp(WIN_SIZE.width * 0.5, WIN_SIZE.height * 0.5));

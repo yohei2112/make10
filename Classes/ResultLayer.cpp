@@ -138,7 +138,7 @@ void ResultLayer::playCallback(CCObject* pSender)
 
 void ResultLayer::tweetCallback(CCObject* pSender)
 {
-    CCString* tweetMessageString = CCString::createWithFormat("MatchNで%d点を記録しました。合計コンボ:%d、最大コンボ%d、消したパネル%d #MatchN", score, totalCombo, maxCombo, deletePanelCount);
+    CCString* tweetMessageString = CCString::createWithFormat("MatchNで%d点を記録しました。合計コンボ:%d、最大コンボ%d、消したパネル%d #MatchN\nhttps://play.google.com/store/apps/details?id=net.yohei2112.make10", score, totalCombo, maxCombo, deletePanelCount);
     TwitterUtil::openTweetDialog(tweetMessageString->getCString());
 }
 

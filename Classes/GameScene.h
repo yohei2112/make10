@@ -75,8 +75,6 @@ protected:
     int dropPanelCount;
     int dropEndCount;
     int holdEndCount;
-    int totalScore;
-    int tmpScore;
     int comboCounter;
     int totalCombo;
     int maxCombo;
